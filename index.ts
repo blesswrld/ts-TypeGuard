@@ -1,75 +1,69 @@
-// Интерфейсы
-interface Car {
-    name: "car";
-    engine: string;
-    wheels: number;
+// Request
+
+interface RequestAnimal {
+    animal: "cat" | "dog" | "bird";
+    breed: string;
+    sterilized?: string;
 }
 
-interface Ship {
-    name: "ship";
-    engine: string;
-    sail: string;
+// Response #1
+
+interface ResponseAvailable {
+    status: "available";
+    data: {
+        animal: "cat" | "dog" | "bird";
+        breed: string;
+        sterilized?: string;
+        location: string;
+        age?: number;
+    };
 }
 
-interface Airplane {
-    name: "airplane";
-    engine: string;
-    wings: string;
+// Response #2
+
+interface ResponseNotAvailable {
+    status: "not available";
+    data: {
+        message: string;
+        nextUpdateIn: Date;
+    };
 }
 
-// Общий интерфейс (не практичный вариант)
-interface ComplexVehicle {
-    name: "car" | "ship" | "airplane";
-    engine: string;
-    wheels?: number;
-    sail?: string;
-    wings?: string;
-}
-
-type Vehicle = Car | Ship | Airplane;
-
-// // Функция Type-Guard
-function isCar(car: Vehicle): car is Car {
-    return "wheels" in car; // Утверждаем тип автомобиля с определенными параметрам
-}
-
-// // Еще функция Type-Guard
-function isShip(ship: Car | Ship | Airplane): ship is Ship {
-    return "sail" in ship; // Утверждаем тип автомобиля с определенными параметрам
-}
-
-const car: ComplexVehicle = {
-    name: "car",
-    engine: "V8",
-};
-
-function repairVehicle(vehicle: ComplexVehicle): void {
-    // Условия
-    // if (isCar(vehicle)) {
-    //     vehicle.wheels;
-    // } else if (isShip(vehicle)) {
-    //     vehicle;
-    // } else {
-    //     vehicle.wings;
-    // }
-
-    // type guard with narrawing types
-    // --- Switch Cases ---
-    switch (vehicle.name) {
-        case "car":
-            console.log(vehicle.wheels! * 2); // ! оператор not-null
-            break;
-        case "ship":
-            console.log(vehicle.sail);
-            break;
-        case "airplane":
-            console.log(vehicle.wings);
-            break;
-        default:
-            // const smth: never = vehicle; // error
-            console.log("Opps error!");
-            break;
+function checkAnimalData(
+    animal: ResponseAvailable | ResponseNotAvailable
+): string {
+    if (!animal) return "Error: No animal data provided";
+    if (animal.status === "available") {
+        // Заменить условие!
+        return `Found a ${animal.data.animal} (${animal.data.breed}) at ${
+            animal.data.location
+        }${animal.data.age ? `, age ${animal.data.age}` : ""}`;
+    } else if (animal.status === "not available") {
+        return `${
+            animal.data.message
+        }, you can try again on ${animal.data.nextUpdateIn.toLocaleDateString()}`;
+    } else {
+        return "Error: Invalid status";
     }
 }
 
-repairVehicle(car); // Выведет NaN из за оператора ! - not null
+// Создаем ручные вызовы
+
+/* const animal: ResponseAvailable = {
+    status: "available",
+    data: { animal: "cat", breed: "Persian", location: "Los Angeles", age: 3 },
+};
+console.log(checkAnimalData(animal)); */
+// Вывод: "Found a cat (Persian) at Los Angeles, age 3"
+
+/* const notAvailable: ResponseNotAvailable = {
+    status: "not available",
+    data: {
+        message: "No dogs available",
+        nextUpdateIn: new Date("2025-05-10"),
+    },
+};
+console.log(checkAnimalData(notAvailable)); */
+// Вывод: "No dogs available, you can try again on 5/10/2025"
+
+// --- ЗАДАЧА ВЫПОЛНЕНА ---
