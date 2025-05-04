@@ -1,31 +1,4 @@
-// Функция с сужением типов
-function printMsg(msg: string[] | number | boolean): void {
-    if (Array.isArray(msg)) {
-        msg.forEach((m) => console.log(m));
-        // Используем функцию isNumber
-    } else if (isNumber(msg)) {
-        console.log(msg);
-    } else {
-        console.log(msg);
-    }
-    console.log(msg);
-}
-
-// Вызов функции
-printMsg(4);
-
-// Первый способ
-// function isNumber(n: string[] | number | boolean): n is number {
-//     return typeof n === "number";
-// }
-
-// Второй способ
-function isNumber(n: unknown): n is number {
-    return typeof n === "number";
-}
-
 // Интерфейсы
-
 interface Car {
     name: "car";
     engine: string;
@@ -44,15 +17,33 @@ interface Airplane {
     wings: string;
 }
 
-interface SuperAirplane {
-    name: "SuperAirplane";
+// Общий интерфейс (не практичный вариант)
+interface ComplexVehicle {
+    name: "car" | "ship" | "airplane";
     engine: string;
-    wings: string;
+    wheels?: number;
+    sail?: string;
+    wings?: string;
 }
 
-type Vehicle = Car | Ship | Airplane | SuperAirplane;
+type Vehicle = Car | Ship | Airplane;
 
-function repairVehicle(vehicle: Vehicle): void {
+// // Функция Type-Guard
+function isCar(car: Vehicle): car is Car {
+    return "wheels" in car; // Утверждаем тип автомобиля с определенными параметрам
+}
+
+// // Еще функция Type-Guard
+function isShip(ship: Car | Ship | Airplane): ship is Ship {
+    return "sail" in ship; // Утверждаем тип автомобиля с определенными параметрам
+}
+
+const car: ComplexVehicle = {
+    name: "car",
+    engine: "V8",
+};
+
+function repairVehicle(vehicle: ComplexVehicle): void {
     // Условия
     // if (isCar(vehicle)) {
     //     vehicle.wheels;
@@ -66,7 +57,7 @@ function repairVehicle(vehicle: Vehicle): void {
     // --- Switch Cases ---
     switch (vehicle.name) {
         case "car":
-            console.log(vehicle.wheels);
+            console.log(vehicle.wheels! * 2); // ! оператор not-null
             break;
         case "ship":
             console.log(vehicle.sail);
@@ -74,22 +65,11 @@ function repairVehicle(vehicle: Vehicle): void {
         case "airplane":
             console.log(vehicle.wings);
             break;
-        case "SuperAirplane":
-            console.log(vehicle.wings);
-            break;
         default:
-            const smth: never = vehicle; // never
+            // const smth: never = vehicle; // error
             console.log("Opps error!");
             break;
     }
 }
 
-// // Функция Type-Guard
-// function isCar(car: Vehicle): car is Car {
-//     return (car as Car).wheels.number !== undefined; // Утверждаем тип автомобиля с определенными параметрам
-// }
-
-// // Еще функция Type-Guard
-// function isShip(ship: Car | Ship | Airplane): ship is Ship {
-//     return "sail" in ship; // Утверждаем тип автомобиля с определенными параметрам
-// }
+repairVehicle(car); // Выведет NaN из за оператора ! - not null
